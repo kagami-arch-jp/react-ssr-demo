@@ -1,0 +1,47 @@
+{
+  "scripts": {
+    "dev": "node --openssl-legacy-provider build/index.js dev",
+    "build": "node --openssl-legacy-provider build/index.js build",
+    "prod": "cross-env ENV=PROD sptcd -rindex.s -wserver"
+  },
+  "dependencies": {
+    "react": "19.2.4",
+    "react-cross-component-state": "^1.0.5",
+    "react-dom": "19.2.4",
+    "sptc": "0.0.38"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
+    "@craco/craco": "^6.1.1",
+    "chalk": "^4.1.0",
+    "cross-env": "7.0.3",
+    "fs-extra": "^10.1.0",
+    "intersection-observer": "^0.12.2",
+    "mini-css-extract-plugin": "1.6.2",
+    "null-loader": "^4.0.1",
+    "open": "^8.4.2",
+    "postcss": "^7.0.0",
+    "postcss-px-to-viewport": "^1.1.1",
+    "react-scripts": "4.0.3",
+    "sass": "^1.69.5",
+    "webpack-dev-server": "3.11.1",
+    "webpackbar": "^5.0.2"
+  },
+  "browserslist": {
+    "production": [
+      "> 1%",
+      "last 2 versions",
+      "not ie <= 8",
+      "Android >= 4.4",
+      "iOS >= 8"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">= 22.22.1"
+  }
+}

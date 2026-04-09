@@ -1,0 +1,131 @@
+<?js
+
+async function resolvePOSTData() {
+	return new Promise(resolve=>{
+		if(!($_RAW_REQUEST.headers['content-length'] > 0)) {
+			resolve(null)
+			return
+		}
+		const buf=[]
+		$_RAW_REQUEST
+		  .on('data', c=>buf.push(c))
+		  .on('end', ()=>resolve(Buffer.concat(buf)))
+			.on('error', ()=>resolve(null))
+	})
+}
+
+const __SSR_PAYLOAD_TIMEOUT__=1e3
+
+class LibSSR{
+
+  getDistDir() {
+    return __IS_DEV__? (__DEV_WWW_DIR__+'/dist'): (__WWW_DIR__+'/app')
+  }
+
+  timelimitQuery(query) {
+    return Promise.race([query, Utils.sleep(__SSR_PAYLOAD_TIMEOUT__, query)])
+  }
+
+  buildContext() {
+    const exports={}
+    const self={module: {exports}, require}
+
+    const NOOP=function() {}
+    Object.assign(self, {
+      window: self,
+      addEventListener: NOOP,
+      WebSocket: NOOP,
+      setInterval: NOOP,
+      setTimeout: NOOP,
+      self,
+
+			queueMicrotask,
+    })
+
+    const location={}
+    const navigator={}
+    const document={}
+    Object.assign(self, {location, navigator, document})
+    const href='http://'+$_RAW_REQUEST['headers']['host']+$_RAW_REQUEST['url']
+    location.href=href
+    ; [, location.pathname, location.search]=href.match(/:\/\/[^/]+([^\?]+)(.*)/)
+    navigator.userAgent=$_RAW_REQUEST['headers']['user-agent'] || 'unknown'
+    document.cookie=$_RAW_REQUEST['headers'].cookie || ''
+
+    self.callServerApi=async (action, data)=>{
+      const {resolve, execute}=include(__ROUTER__)
+			const w=await execute(action, {ssrQueryData: data})
+			return w?.data
+    }
+
+    if(__IS_DEV__) self.console=console
+
+    return self
+  }
+
+  getVm() {
+    const filename=this.getDistDir()+'/server/index.js'
+    const contentWrapper=__IS_DEV__?
+      source=>source.replace(/(throw new Error.+?HMR.+?Hot Module Replacement is disabled.)/, 'return;$1'):
+      undefined
+    return Utils.compileFile(filename, {
+      contentWrapper,
+      compileFunc: source=>{
+        const vm=require('vm')
+        const path=require('path')
+        const fn=path.resolve(filename)
+        return new vm.Script(source, fn)
+      },
+      customCache: (Application.ssrVmCache=Application.ssrVmCache || {}),
+    })
+  }
+
+	getAssets() {
+		const path=require('path')
+		const assets_fn=path.resolve(this.getDistDir()+'/assets.json')
+		const assets=require(assets_fn)
+		if(__IS_DEV__) delete require.cache[assets_fn]
+		return assets
+	}
+
+  async render(disableSSR=false) {
+
+		const IS_FORCE_CSR=disableSSR || $_QUERY.force_csr==='1'
+
+		const data={
+			ssrData: {
+				degradeCsr: IS_FORCE_CSR,
+				payload: null,
+			},
+			ssrHTML: '',
+			js: [],
+			css: [],
+		}
+
+		try{
+			if(IS_FORCE_CSR) {
+				data.ssrData.degradeCsr=true
+			}else{
+				const srvModule=this.getVm().runInNewContext(this.buildContext())
+				data.ssrData.payload=await this.timelimitQuery(srvModule.init())
+				data.ssrHTML=srvModule.renderToString()
+			}
+		}catch(e) {
+			data.ssrData.degradeCsr=true
+			if(__IS_DEV__) console.log(e)
+		}
+
+    const {client}=this.getAssets()
+
+		if(!__IS_DEV__) {
+  	  data.css.push(...client.css.map(p=>`/assets/app/${p}`))
+			data.js.push(...client.js.map(p=>`/assets/app/${p}`))
+		}else{
+			data.css.push(...client.css)
+			data.js.push(...client.js)
+		}
+
+    include(__dirname+'/ssr.html.s', data)
+
+  }
+}
