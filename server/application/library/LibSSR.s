@@ -64,7 +64,7 @@ class LibSSR{
   }
 
   getVm() {
-    const filename=this.getDistDir()+'/server/index.js'
+    const filename=this.getDistDir()+'/server.js'
     const contentWrapper=__IS_DEV__?
       source=>source.replace(/(throw new Error.+?HMR.+?Hot Module Replacement is disabled.)/, 'return;$1'):
       undefined
@@ -106,7 +106,9 @@ class LibSSR{
 			if(IS_FORCE_CSR) {
 				data.ssrData.degradeCsr=true
 			}else{
-				const srvModule=this.getVm().runInNewContext(this.buildContext())
+				const ctx=this.buildContext()
+				this.getVm().runInNewContext(ctx)
+				const srvModule=ctx.module.exports
 				data.ssrData.payload=await this.timelimitQuery(srvModule.init())
 				data.ssrHTML=srvModule.renderToString()
 			}
@@ -115,14 +117,14 @@ class LibSSR{
 			if(__IS_DEV__) console.log(e)
 		}
 
-    const {client}=this.getAssets()
+    const {js, css}=this.getAssets()
 
 		if(!__IS_DEV__) {
-  	  data.css.push(...client.css.map(p=>`/assets/app/${p}`))
-			data.js.push(...client.js.map(p=>`/assets/app/${p}`))
+  	  data.css.push(...css.map(p=>`/assets/app/${p}`))
+			data.js.push(...js.map(p=>`/assets/app/${p}`))
 		}else{
-			data.css.push(...client.css)
-			data.js.push(...client.js)
+			data.css.push(...css)
+			data.js.push(...js)
 		}
 
     include(__dirname+'/ssr.html.s', data)

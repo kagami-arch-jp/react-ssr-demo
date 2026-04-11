@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "dev": "node --openssl-legacy-provider build/index.js dev",
-    "build": "node --openssl-legacy-provider build/index.js build",
-    "prod": "cross-env ENV=PROD sptcd -rindex.s -wserver"
+    "dev": "node build/webpack5 dev",
+    "build": "node build/webpack5 build",
+    "serve": "cross-env ENV=PROD sptcd -rindex.s -wserver"
   },
   "dependencies": {
     "react": "19.2.4",
@@ -11,21 +11,26 @@
     "sptc": "0.0.38"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
-    "@craco/craco": "^6.1.1",
-    "chalk": "^4.1.0",
+    "@babel/runtime": "^7.29.2",
+    "core-js": "^3.49.0",
+    "@babel/plugin-transform-runtime": "^7.29.0",
+    "@babel/preset-env": "^7.29.2",
+    "@babel/preset-react": "^7.28.5",
+    "autoprefixer": "^9.8.8",
+    "babel-loader": "^10.1.1",
+    "chalk": "^4.1.2",
     "cross-env": "7.0.3",
-    "fs-extra": "^10.1.0",
-    "intersection-observer": "^0.12.2",
+    "css-loader": "^7.1.4",
     "mini-css-extract-plugin": "1.6.2",
-    "null-loader": "^4.0.1",
-    "open": "^8.4.2",
     "postcss": "^7.0.0",
+    "postcss-loader": "^5.3.0",
     "postcss-px-to-viewport": "^1.1.1",
-    "react-scripts": "4.0.3",
     "sass": "^1.69.5",
-    "webpack-dev-server": "3.11.1",
-    "webpackbar": "^5.0.2"
+    "sass-loader": "^16.0.7",
+    "webpack": "^5.106.1",
+    "webpack-dev-server": "^5.2.3",
+    "webpack-merge": "^6.0.1",
+    "webpack-node-externals": "^3.0.0"
   },
   "browserslist": {
     "production": [

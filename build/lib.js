@@ -8,12 +8,10 @@ function getRuntimeArgv() {
   const p=process.argv[2]
   const IS_DEV=p==='dev'
   const IS_BUILD=p==='build'
-  const IS_SERVE=p==='serve'
 
   return {
     IS_DEV,
     IS_BUILD,
-    IS_SERVE,
     RND: RUNTIME_RND_STR,
   }
 }
@@ -83,14 +81,6 @@ function checkEnv() {
   }
 }
 
-function getPostCssPlugins() {
-  return require("postcss-load-config").sync({}, __dirname+'/postcss.config.js')
-}
-
-function requireNodeModuleFile(fn) {
-  return require(APP_PATH+'/node_modules/'+fn)
-}
-
 function run(exe, argv) {
   const p=require('child_process').spawn(
     require('os').platform()==='win32'? exe+'.cmd': exe, argv)
@@ -102,7 +92,5 @@ module.exports={
   APP_PATH,
   getRuntimeArgv,
   checkEnv,
-  getPostCssPlugins,
-  requireNodeModuleFile,
   run,
 }

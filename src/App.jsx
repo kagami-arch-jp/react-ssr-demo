@@ -1,5 +1,7 @@
 import React from 'react'
 
+import './App.scss'
+
 import {sharedCounter} from '@/store/app'
 
 import {fetch} from '@/utils/fetch'

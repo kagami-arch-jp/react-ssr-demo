@@ -4,31 +4,11 @@ function is_server(ctx) {
   return (ctx.webpackLoaderThis.target + '').indexOf('node') > -1;
 }
 
-const watches={}, watchListeners={}
-function autoTouchByChanges(touchFile, watchFiles) {
-  if(!argv.IS_DEV) return;
-  const fs=require('fs')
-  for(let fn of watchFiles) {
-    watches[fn]=watches[fn] || new Set
-    watches[fn].add(touchFile)
-  }
-  for(let fn in watches) {
-    if(watchListeners[fn]) continue
-    watchListeners[fn]=true
-    fs.watch(fn, _=>{
-      for(let t of watches[fn].keys()) {
-        fs.utimesSync(t, new Date(), new Date())
-      }
-    })
-  }
-}
-
 const A={
   EXTENDS: (ctx) => ({
     ...argv,
     IS_NODE_TARGET: is_server(ctx),
     SRC: __dirname+'/../src',
-    autoTouchByChanges,
   }),
   TPLS: [
     /\.jsx?$/, ctx=>{
@@ -51,6 +31,11 @@ const A={
       const ffn=path.resolve(fn).substr(src.length).replace(/\.[a-z\d]+$/, '')
       let t=ffn.replace(/[\/\\]+([^/\\]+)\.[^/\\]+$/, '').replace(/[^a-z\d_-]/ig, '_')
       return str.replace(/\b__view_scope\b/g, 'V_'+argv.RND+'_'+t)
+    },
+
+    /\.s?css$/, ctx=>{
+      if(is_server(ctx)) return ''
+      return ctx.str
     },
 
   ],
