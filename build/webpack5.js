@@ -197,15 +197,17 @@ function getWebpackCompiler() {
     if(errors.length) {
       console.log(chalk.red('Failed to compile.\n'))
       console.log(errors[0])
-    }else if(warnings.length) {
-      console.log(chalk.yellow('Compiled with warnings.\n'))
-      console.log(warnings.join('\n\n'))
-    }else{
-      const assets=resolveAssets(clientStats.entrypoints.main.assets)
-      fs.writeFileSync(APP_PATH+'/'+outputPath+'/assets.json', JSON.stringify(assets))
-      console.info(stats.toString({ colors: true }))
     }
+    if(warnings.length) {
+      console.log(chalk.yellow('Compiled with warnings.\n'))
+      console.log(warnings.map(x=>x.message).join('\n'))
+    }
+
+    const assets=resolveAssets(clientStats.entrypoints.main.assets)
+    fs.writeFileSync(APP_PATH+'/'+outputPath+'/assets.json', JSON.stringify(assets))
+    console.info(stats.toString({ colors: true }))
   })
+
   return multiCompiler
 }
 
