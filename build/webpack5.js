@@ -125,6 +125,13 @@ const client = merge(common(false), {
   module: {
     rules: [
       {
+        test: /\.(png|jpe?g|gif)$/i,
+        loader: 'file-loader',
+        options: {
+          outputPath: 'client/images',
+        },
+      },
+      {
         test: /\.s[ac]ss$/i,
         use: [
           MiniCssExtractPlugin.loader,
@@ -163,6 +170,17 @@ const server = merge(common(true), {
   mode: IS_DEV? 'development': 'production',
   entry: {
     server: path.resolve(APP_PATH, 'src/bootstrap.jsx')
+  },
+
+  module: {
+    rules: [
+      {
+        loader: 'file-loader',
+        options: {
+          emitFile: false,
+        },
+      },
+    ]
   },
 
   // Node のモジュールはバンドルしない（高速化・サイズ削減）
@@ -207,7 +225,6 @@ function getWebpackCompiler() {
     fs.writeFileSync(APP_PATH+'/'+outputPath+'/assets.json', JSON.stringify(assets))
     console.info(stats.toString({ colors: true }))
   })
-
   return multiCompiler
 }
 
@@ -227,19 +244,14 @@ function devServer() {
   const WebpackDevServer=require('webpack-dev-server')
   const multiCompiler=getWebpackCompiler()
   const devServerOptions = {
-    open: true,
     compress: true,
     hot: true,
     port: 3000,
-    historyApiFallback: true, // SPA の場合は必須
-    // SSR 用サーバー（ポート 9090）へのプロキシ例
-    proxy: [
-      {
-        context: ["/"],
-        target: "http://127.0.0.1:9090",
-      },
-    ],
-
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': 'true',
+    },
+    historyApiFallback: true,
     devMiddleware: {
       // Enables writing files to disk
       writeToDisk: filePath=>/server\.js/.test(filePath),
