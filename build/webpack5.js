@@ -183,6 +183,17 @@ const server = merge(common(true), {
     ]
   },
 
+  module: {
+    rules: [
+      {
+        loader: 'file-loader',
+        options: {
+          emitFile: false,
+        },
+      },
+    ]
+  },
+
   // Node のモジュールはバンドルしない（高速化・サイズ削減）
   externals: [nodeExternals()],
 
