@@ -14,7 +14,7 @@ const {
 }=require(__dirname+'/lib')
 const {NPM_ARGV, IS_DEV, IS_BUILD, IS_SERVE}=getRuntimeArgv()
 
-const [outputPath, publicPath]=IS_DEV? ['dist', '/']: ['server/public/app', '/assets/app']
+const [outputPath, publicPath]=IS_DEV? ['dist', '/']: ['server/public/app', '/assets/app/']
 
 class RemoveAssetsPlugin {
   constructor(pattern=/\.txt$/) {
@@ -287,8 +287,22 @@ function build() {
 
 checkEnv()
 
-const fse=require('fs-extra')
-fse.removeSync(APP_PATH+'/'+outputPath)
+
+async function cleanDir(dir, stack=[]) {
+  for(const fn of fs.readdirSync(dir)) {
+    const fullname=dir+'/'+fn
+    const isdir=fs.statSync(fullname).isDirectory()
+    if(isdir) {
+      await cleanDir(fullname, stack)
+    }
+    const err=await new Promise(r=>{
+      fs[isdir? 'rmdir': 'unlink'](fullname, r)
+    })
+    if(err) throw err
+  }
+}
+
+cleanDir(APP_PATH+'/'+outputPath)
 
 if(IS_DEV) {
   devServer()
