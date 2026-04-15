@@ -175,6 +175,7 @@ const server = merge(common(true), {
   module: {
     rules: [
       {
+        test: /\.(png|jpe?g|gif|s?css)$/i,
         loader: 'file-loader',
         options: {
           emitFile: false,
