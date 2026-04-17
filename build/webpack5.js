@@ -4,6 +4,8 @@ const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const nodeExternals = require('webpack-node-externals');
 const MiniCssExtractPlugin=require('mini-css-extract-plugin')
+const CaseSensitivePathsPlugin=require('case-sensitive-paths-webpack-plugin')
+
 const chalk=require('chalk')
 
 const {
@@ -84,6 +86,11 @@ const common = (isServer)=>({
         ]
       },
       {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
         loader: 'sptc/dist/webpack.loader.js',
         options: {
           file: path.resolve(__dirname, 'sptc.inject.js'),
@@ -108,6 +115,7 @@ const common = (isServer)=>({
 
   plugins: [
     new RemoveAssetsPlugin(),
+    new CaseSensitivePathsPlugin(),
   ],
 
 });
@@ -175,23 +183,20 @@ const server = merge(common(true), {
   module: {
     rules: [
       {
-        test: /\.(png|jpe?g|gif|s?css)$/i,
+        test: /\.(png|jpe?g|gif)$/i,
         loader: 'file-loader',
         options: {
           emitFile: false,
+          outputPath: 'client/images',
         },
       },
-    ]
-  },
-
-  module: {
-    rules: [
       {
+        test: /\.s?css$/i,
         loader: 'file-loader',
         options: {
           emitFile: false,
         },
-      },
+      }
     ]
   },
 
@@ -232,7 +237,6 @@ function getWebpackCompiler() {
       console.log(chalk.yellow('Compiled with warnings.\n'))
       console.log(warnings.map(x=>x.message).join('\n'))
     }
-
     const assets=resolveAssets(clientStats.entrypoints.main.assets)
     fs.writeFileSync(APP_PATH+'/'+outputPath+'/assets.json', JSON.stringify(assets))
     console.info(stats.toString({ colors: true }))
@@ -256,7 +260,7 @@ function devServer() {
   const WebpackDevServer=require('webpack-dev-server')
   const multiCompiler=getWebpackCompiler()
   const devServerOptions = {
-    compress: true,
+    compress: false,
     hot: true,
     port: 3000,
     headers: {
@@ -275,7 +279,7 @@ function devServer() {
     await devServer.start();
   };
 
-  run('sptcd', '-rindex.s -wserver'.split(' '))
+  run('sptcd', '-d -rindex.s -wserver'.split(' '))
 
   runServer();
 
@@ -303,10 +307,11 @@ async function cleanDir(dir, stack=[]) {
   }
 }
 
-cleanDir(APP_PATH+'/'+outputPath)
+cleanDir(APP_PATH+'/'+outputPath).catch(e=>{}).finally(()=>{
 
-if(IS_DEV) {
-  devServer()
-}else if(IS_BUILD) {
-  build()
-}
+  if(IS_DEV) {
+    devServer()
+  }else if(IS_BUILD) {
+    build()
+  }
+})
