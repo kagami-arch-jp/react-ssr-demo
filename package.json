@@ -5,6 +5,8 @@
     "serve": "cross-env ENV=PROD sptcd -d -rindex.s -wserver"
   },
   "dependencies": {
+    "@types/react": "^19.2.3",
+    "@types/react-dom": "^19.2.3",
     "react": "19.2.4",
     "react-cross-component-state": "^1.0.7",
     "react-dom": "19.2.4",
