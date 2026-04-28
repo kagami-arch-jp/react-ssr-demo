@@ -10,7 +10,7 @@
     "react": "19.2.4",
     "react-cross-component-state": "^1.0.7",
     "react-dom": "19.2.4",
-    "sptc": "0.0.38"
+    "sptc": "0.1.2"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.29.0",

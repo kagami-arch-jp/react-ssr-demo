@@ -2,7 +2,7 @@ const path = require('path');
 const fs=require('fs')
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
-const nodeExternals = require('webpack-node-externals');
+// const nodeExternals = require('webpack-node-externals');
 const MiniCssExtractPlugin=require('mini-css-extract-plugin')
 const CaseSensitivePathsPlugin=require('case-sensitive-paths-webpack-plugin')
 
@@ -80,7 +80,7 @@ const common = (isServer)=>({
                 ],
                 ['@babel/preset-react', { runtime: 'automatic' }]
               ],
-              plugins: ['@babel/plugin-transform-runtime']
+              plugins: ['@babel/plugin-transform-runtime'],
             }
           },
         ]
@@ -91,6 +91,8 @@ const common = (isServer)=>({
         exclude: /node_modules/,
       },
       {
+        test: /\.(jsx?)$/,
+        exclude: /node_modules/,
         loader: 'sptc/dist/webpack.loader.js',
         options: {
           file: path.resolve(__dirname, 'sptc.inject.js'),
@@ -200,8 +202,8 @@ const server = merge(common(true), {
     ]
   },
 
-  // Node のモジュールはバンドルしない（高速化・サイズ削減）
-  externals: [nodeExternals()],
+  // npmで公開されるバージョンは全部ワンパークにしてインストールスピードを向上させる
+  externals: [], // [nodeExternals()],
 
   // 出力先はすべて同じディレクトリにまとめる
   output: {
