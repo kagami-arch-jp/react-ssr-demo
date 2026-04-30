@@ -32,7 +32,3 @@
 1. `npm i` でインストール
 2. `npm run dev` を実行し、`http://127.0.0.1:9090` を開く
 3. `npm run build` でビルド
-
-## 外部依存関係
-
-1. [ollama](https://ollama.com/download)
