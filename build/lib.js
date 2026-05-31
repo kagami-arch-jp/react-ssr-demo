@@ -8,10 +8,12 @@ function getRuntimeArgv() {
   const p=process.argv[2]
   const IS_DEV=p==='dev'
   const IS_BUILD=p==='build'
+  const IS_BUILD_STATIC=process.env.ENV==='STATIC'
 
   return {
     IS_DEV,
     IS_BUILD,
+    IS_BUILD_STATIC,
     RND: RUNTIME_RND_STR,
   }
 }

@@ -6,6 +6,11 @@ export async function init(payload) {
   return app?.[r]?.(payload) || null
 }
 
+export function headerString(payload) {
+  const r='headerString'
+  return app?.[r]?.(payload) || null
+}
+
 #ifndef IS_NODE_TARGET
 
 import ReactDOM from 'react-dom/client'

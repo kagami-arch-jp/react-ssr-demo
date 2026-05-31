@@ -21,5 +21,5 @@ define('__ROUTER_SETTING__', __dirname+'/conf/router.s')
 define('__ROUTER__', __dirname+'/router.s')
 
 const {resolve, execute}=include(__ROUTER__)
-const pathname=resolve($_REQUEST_FILE['pathname'])
+const pathname=$_ENV.RUNTIME==='NodeCGI'? $_QUERY.uri: resolve($_REQUEST_FILE['pathname'])
 execute(pathname)

@@ -5,6 +5,7 @@
 <?js if(__IS_DEV__) { ?>
 <base href='http://127.0.0.1:3000' />
 <?js } ?>
+  <?js echo(headerString || '') ?>
   <link rel="icon" href="data:,">
   <base target='_blank' />
   <meta name="apple-mobile-web-app-capable" content="yes" />

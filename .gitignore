@@ -3,4 +3,5 @@ node_modules
 server/public/*
 dist/*
 .DS_*
+dist.zip
 

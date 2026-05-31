@@ -97,6 +97,7 @@ class LibSSR{
 				degradeCsr: IS_FORCE_CSR,
 				payload: null,
 			},
+			headerString: null,
 			ssrHTML: '',
 			js: [],
 			css: [],
@@ -110,6 +111,7 @@ class LibSSR{
 				this.getVm().runInNewContext(ctx)
 				const srvModule=ctx.module.exports
 				data.ssrData.payload=await this.timelimitQuery(srvModule.init())
+				data.headerString=srvModule.headerString()
 				data.ssrHTML=srvModule.renderToString()
 			}
 		}catch(e) {

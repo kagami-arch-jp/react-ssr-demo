@@ -14,7 +14,7 @@ const {
   checkEnv,
   run,
 }=require(__dirname+'/lib')
-const {NPM_ARGV, IS_DEV, IS_BUILD, IS_SERVE}=getRuntimeArgv()
+const {NPM_ARGV, IS_DEV, IS_BUILD, IS_SERVE, IS_BUILD_STATIC}=getRuntimeArgv()
 
 const [outputPath, publicPath]=IS_DEV? ['dist', '/']: ['server/public/app', '/assets/app/']
 
@@ -44,7 +44,7 @@ function replaceDevName(x) {
 const common = (isServer)=>({
   optimization: {
     runtimeChunk: false,
-    splitChunks: (isServer || IS_DEV)? false: {
+    splitChunks: (isServer || IS_DEV || IS_BUILD_STATIC)? false: {
       chunks: 'all',
       cacheGroups: {
         vendor: {
@@ -135,7 +135,7 @@ const client = merge(common(false), {
   module: {
     rules: [
       {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(png|jpe?g|gif|svg)$/i,
         loader: 'file-loader',
         options: {
           outputPath: 'client/images',
@@ -153,6 +153,12 @@ const client = merge(common(false), {
            },
          },
           "sass-loader",
+          {
+            loader: 'sptc/dist/webpack.loader.js',
+            options: {
+              file: path.resolve(__dirname, 'sptc.inject.js'),
+            }
+          },
         ],
       }
     ]
@@ -185,7 +191,7 @@ const server = merge(common(true), {
   module: {
     rules: [
       {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(png|jpe?g|gif|svg)$/i,
         loader: 'file-loader',
         options: {
           emitFile: false,

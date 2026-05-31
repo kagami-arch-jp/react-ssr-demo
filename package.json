@@ -2,15 +2,18 @@
   "scripts": {
     "dev": "node build/webpack5 dev",
     "build": "node build/webpack5 build",
-    "serve": "cross-env ENV=PROD sptcd -d -rindex.s -wserver"
+    "static": "node build/static",
+    "serve": "cross-env ENV=PROD sptcd -d -rindex.s -wserver",
+    "build-static": "cross-env ENV=STATIC npm run build && npm run static"
   },
   "dependencies": {
     "@types/react": "^19.2.3",
     "@types/react-dom": "^19.2.3",
+    "archiver": "^8.0.0",
     "react": "19.2.4",
     "react-cross-component-state": "^1.0.7",
     "react-dom": "19.2.4",
-    "sptc": "0.1.2"
+    "sptc": "0.1.8"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.29.0",
